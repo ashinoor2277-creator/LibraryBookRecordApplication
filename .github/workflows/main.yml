@@ -29,9 +29,11 @@ jobs:
 
       - name: Compile JavaFX application
         run: |
+          cd LibraryBookRecordApplication
           mkdir -p out
           javac \
-            --module-path javafx-sdk-26/lib \
+            --module-path ../javafx-sdk-26/lib \
             --add-modules javafx.controls \
             -d out \
+            src/module-info.java \
             src/library/*.java
