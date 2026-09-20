@@ -1,7 +1,7 @@
-
 package library;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -9,140 +9,119 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+
 public class Main extends Application {
 
-    private Library library = new Library();
+    private Library library;
 
     private TableView<Book> table;
+    private ObservableList<Book> bookList;
 
     private TextField idField;
     private TextField titleField;
     private TextField authorField;
     private TextField categoryField;
+    private TextField searchField;
 
     private ComboBox<String> statusBox;
 
-    private TextField searchField;
-
-    private Label totalBooksLabel;
-    private Label availableBooksLabel;
-    private Label issuedBooksLabel;
+    private Label totalLabel;
+    private Label availableLabel;
+    private Label issuedLabel;
 
     @Override
     public void start(Stage stage) {
 
-        // =====================================================
+        library = new Library();
+
+        // =========================
+        // MAIN WINDOW
+        // =========================
+
+        BorderPane root = new BorderPane();
+
+        root.setPadding(new Insets(15));
+
+        // =========================
         // HEADER
-        // =====================================================
+        // =========================
 
-        Label title =
-                new Label("📚  LIBRARY BOOK RECORD SYSTEM");
+        Label heading =
+                new Label("📚 LIBRARY BOOK RECORD SYSTEM");
 
-        title.setStyle(
-                "-fx-font-size: 30px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: white;"
+        heading.setStyle(
+                "-fx-font-size: 28px;" +
+                "-fx-font-weight: bold;"
         );
 
         Label subtitle =
-                new Label(
-                        "Manage your library books easily and efficiently"
-                );
+                new Label("Manage your library books easily");
 
         subtitle.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-text-fill: #dbeafe;"
+                "-fx-font-size: 15px;"
         );
 
         VBox header =
-                new VBox(
-                        6,
-                        title,
-                        subtitle
-                );
+                new VBox(5, heading, subtitle);
 
         header.setAlignment(Pos.CENTER);
 
-        header.setPadding(
-                new Insets(25)
-        );
+        root.setTop(header);
 
-        header.setStyle(
-                "-fx-background-color: #1e3a8a;" +
-                "-fx-background-radius: 15;"
-        );
-
-        // =====================================================
+        // =========================
         // STATISTICS
-        // =====================================================
+        // =========================
 
-        totalBooksLabel =
-                new Label(
-                        "Total Books: "
-                                + library.getBooks().size()
+        totalLabel = new Label();
+        availableLabel = new Label();
+        issuedLabel = new Label();
+
+        VBox totalCard =
+                createCard(
+                        "📚 Total Books",
+                        totalLabel
                 );
 
-        availableBooksLabel =
-                new Label(
-                        "Available: "
-                                + countAvailable()
+        VBox availableCard =
+                createCard(
+                        "✅ Available",
+                        availableLabel
                 );
 
-        issuedBooksLabel =
-                new Label(
-                        "Issued: "
-                                + countIssued()
+        VBox issuedCard =
+                createCard(
+                        "📕 Issued",
+                        issuedLabel
                 );
-
-        styleStatisticsLabel(totalBooksLabel);
-        styleStatisticsLabel(availableBooksLabel);
-        styleStatisticsLabel(issuedBooksLabel);
 
         HBox statistics =
                 new HBox(
                         20,
-                        createStatCard(
-                                "📚",
-                                totalBooksLabel,
-                                "#dbeafe"
-                        ),
-                        createStatCard(
-                                "✅",
-                                availableBooksLabel,
-                                "#dcfce7"
-                        ),
-                        createStatCard(
-                                "📤",
-                                issuedBooksLabel,
-                                "#fee2e2"
-                        )
+                        totalCard,
+                        availableCard,
+                        issuedCard
                 );
 
         statistics.setAlignment(Pos.CENTER);
 
-        statistics.setPadding(
-                new Insets(5, 0, 5, 0)
-        );
-
-        // =====================================================
-        // INPUT FIELDS
-        // =====================================================
+        // =========================
+        // INPUT FORM
+        // =========================
 
         idField = new TextField();
         idField.setPromptText("Enter Book ID");
@@ -165,48 +144,75 @@ public class Main extends Application {
 
         statusBox.setValue("Available");
 
-        statusBox.setPrefWidth(200);
+        GridPane form = new GridPane();
 
-        // =====================================================
-        // INPUT GRID
-        // =====================================================
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(15));
 
-        GridPane inputGrid = new GridPane();
+        form.add(
+                new Label("Book ID:"),
+                0,
+                0
+        );
 
-        inputGrid.setHgap(15);
-        inputGrid.setVgap(12);
-        inputGrid.setPadding(new Insets(10));
+        form.add(
+                idField,
+                1,
+                0
+        );
 
-        Label idLabel = new Label("Book ID");
-        Label titleLabel = new Label("Book Title");
-        Label authorLabel = new Label("Author");
-        Label categoryLabel = new Label("Category");
-        Label statusLabel = new Label("Status");
+        form.add(
+                new Label("Book Title:"),
+                2,
+                0
+        );
 
-        styleFormLabel(idLabel);
-        styleFormLabel(titleLabel);
-        styleFormLabel(authorLabel);
-        styleFormLabel(categoryLabel);
-        styleFormLabel(statusLabel);
+        form.add(
+                titleField,
+                3,
+                0
+        );
 
-        inputGrid.add(idLabel, 0, 0);
-        inputGrid.add(idField, 1, 0);
+        form.add(
+                new Label("Author:"),
+                0,
+                1
+        );
 
-        inputGrid.add(titleLabel, 2, 0);
-        inputGrid.add(titleField, 3, 0);
+        form.add(
+                authorField,
+                1,
+                1
+        );
 
-        inputGrid.add(authorLabel, 0, 1);
-        inputGrid.add(authorField, 1, 1);
+        form.add(
+                new Label("Category:"),
+                2,
+                1
+        );
 
-        inputGrid.add(categoryLabel, 2, 1);
-        inputGrid.add(categoryField, 3, 1);
+        form.add(
+                categoryField,
+                3,
+                1
+        );
 
-        inputGrid.add(statusLabel, 0, 2);
-        inputGrid.add(statusBox, 1, 2);
+        form.add(
+                new Label("Status:"),
+                0,
+                2
+        );
 
-        // =====================================================
-        // FORM BUTTONS
-        // =====================================================
+        form.add(
+                statusBox,
+                1,
+                2
+        );
+
+        // =========================
+        // BUTTONS
+        // =========================
 
         Button addButton =
                 new Button("➕ Add Book");
@@ -218,87 +224,71 @@ public class Main extends Application {
                 new Button("🗑 Delete");
 
         Button clearButton =
-                new Button("Clear");
+                new Button("🧹 Clear");
 
-        styleButton(addButton, "#2563eb");
-        styleButton(updateButton, "#7c3aed");
-        styleButton(deleteButton, "#dc2626");
-        styleButton(clearButton, "#64748b");
+        Button issueButton =
+                new Button("📕 Issue Book");
 
-        addButton.setOnAction(
-                e -> addBook()
+        Button returnButton =
+                new Button("📗 Return Book");
+
+        addButton.setStyle(
+                "-fx-background-color: #16a34a;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        updateButton.setOnAction(
-                e -> updateBook()
+        updateButton.setStyle(
+                "-fx-background-color: #2563eb;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        deleteButton.setOnAction(
-                e -> deleteBook()
+        deleteButton.setStyle(
+                "-fx-background-color: #dc2626;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        clearButton.setOnAction(
-                e -> clearFields()
+        clearButton.setStyle(
+                "-fx-background-color: #64748b;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        HBox buttons =
+        issueButton.setStyle(
+                "-fx-background-color: #f97316;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
+        );
+
+        returnButton.setStyle(
+                "-fx-background-color: #059669;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
+        );
+
+        HBox buttonBox =
                 new HBox(
                         10,
                         addButton,
                         updateButton,
                         deleteButton,
-                        clearButton
+                        clearButton,
+                        issueButton,
+                        returnButton
                 );
 
-        buttons.setAlignment(Pos.CENTER);
+        buttonBox.setAlignment(Pos.CENTER);
 
-        // =====================================================
-        // FORM TITLE
-        // =====================================================
-
-        Label formTitle =
-                new Label(
-                        "📖  Book Information"
-                );
-
-        formTitle.setStyle(
-                "-fx-font-size: 19px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #6d28d9;"
-        );
-
-        // =====================================================
-        // FORM CARD
-        // =====================================================
-
-        VBox formCard =
-                new VBox(
-                        12,
-                        formTitle,
-                        inputGrid,
-                        buttons
-                );
-
-        formCard.setPadding(
-                new Insets(20)
-        );
-
-        formCard.setStyle(
-                "-fx-background-color: #f5f3ff;" +
-                "-fx-background-radius: 15;" +
-                "-fx-border-color: #c4b5fd;" +
-                "-fx-border-radius: 15;" +
-                "-fx-border-width: 2;"
-        );
-
-        // =====================================================
-        // SEARCH
-        // =====================================================
+        // =========================
+        // SEARCH AREA
+        // =========================
 
         searchField = new TextField();
 
         searchField.setPromptText(
-                "🔍 Search by Book ID or Title"
+                "Search by Book ID or Title..."
         );
 
         searchField.setPrefWidth(300);
@@ -309,39 +299,25 @@ public class Main extends Application {
         Button showAllButton =
                 new Button("📋 Show All");
 
-        // NEW BUTTON FOR COMMIT 2
         Button resetSearchButton =
                 new Button("🔄 Reset Search");
 
-        styleButton(
-                searchButton,
-                "#0891b2"
+        searchButton.setStyle(
+                "-fx-background-color: #2563eb;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        styleButton(
-                showAllButton,
-                "#0f766e"
+        showAllButton.setStyle(
+                "-fx-background-color: #0891b2;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
-        styleButton(
-                resetSearchButton,
-                "#9333ea"
-        );
-
-        searchButton.setOnAction(
-                e -> searchBook()
-        );
-
-        showAllButton.setOnAction(
-                e -> refreshTable()
-        );
-
-        // NEW RESET SEARCH FUNCTION
-        resetSearchButton.setOnAction(
-                e -> {
-                    searchField.clear();
-                    refreshTable();
-                }
+        resetSearchButton.setStyle(
+                "-fx-background-color: #9333ea;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-weight: bold;"
         );
 
         HBox searchBox =
@@ -353,101 +329,62 @@ public class Main extends Application {
                         resetSearchButton
                 );
 
-        searchBox.setAlignment(
-                Pos.CENTER
-        );
+        searchBox.setAlignment(Pos.CENTER);
 
-        // =====================================================
+        // =========================
         // TABLE
-        // =====================================================
+        // =========================
 
         table = new TableView<>();
 
-        table.setPrefHeight(300);
-
         TableColumn<Book, String> idColumn =
-                new TableColumn<>("Book ID");
+                new TableColumn<>("ID");
 
         idColumn.setCellValueFactory(
-                new PropertyValueFactory<>("id")
+                data ->
+                        new SimpleStringProperty(
+                                data.getValue().getId()
+                        )
         );
 
         TableColumn<Book, String> titleColumn =
-                new TableColumn<>("Book Title");
+                new TableColumn<>("Title");
 
         titleColumn.setCellValueFactory(
-                new PropertyValueFactory<>("title")
+                data ->
+                        new SimpleStringProperty(
+                                data.getValue().getTitle()
+                        )
         );
 
         TableColumn<Book, String> authorColumn =
                 new TableColumn<>("Author");
 
         authorColumn.setCellValueFactory(
-                new PropertyValueFactory<>("author")
+                data ->
+                        new SimpleStringProperty(
+                                data.getValue().getAuthor()
+                        )
         );
 
         TableColumn<Book, String> categoryColumn =
                 new TableColumn<>("Category");
 
         categoryColumn.setCellValueFactory(
-                new PropertyValueFactory<>("category")
+                data ->
+                        new SimpleStringProperty(
+                                data.getValue().getCategory()
+                        )
         );
 
         TableColumn<Book, String> statusColumn =
                 new TableColumn<>("Status");
 
         statusColumn.setCellValueFactory(
-                new PropertyValueFactory<>("status")
-        );
-
-        // =====================================================
-        // COLORFUL STATUS CELLS
-        // =====================================================
-
-        statusColumn.setCellFactory(
-                column ->
-                        new TableCell<Book, String>() {
-
-                            @Override
-                            protected void updateItem(
-                                    String status,
-                                    boolean empty) {
-
-                                super.updateItem(
-                                        status,
-                                        empty
-                                );
-
-                                if (empty ||
-                                        status == null) {
-
-                                    setText(null);
-                                    setStyle("");
-
-                                } else {
-
-                                    setText(status);
-
-                                    if (status.equals(
-                                            "Available")) {
-
-                                        setStyle(
-                                                "-fx-text-fill: #15803d;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-background-color: #dcfce7;"
-                                        );
-
-                                    } else {
-
-                                        setStyle(
-                                                "-fx-text-fill: #b91c1c;" +
-                                                "-fx-font-weight: bold;" +
-                                                "-fx-background-color: #fee2e2;"
-                                        );
-                                    }
-                                }
-                            }
-                        }
+                data ->
+                        new SimpleStringProperty(
+                                data.getValue().getStatus()
+                        )
         );
 
         table.getColumns().addAll(
@@ -459,19 +396,71 @@ public class Main extends Application {
         );
 
         table.setColumnResizePolicy(
-                TableView.CONSTRAINED_RESIZE_POLICY
+                TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN
         );
 
-        // =====================================================
-        // TABLE ROW SELECTION
-        // =====================================================
+        // =========================
+        // STATUS COLORS
+        // =========================
+
+        statusColumn.setCellFactory(
+                column ->
+                        new TableCell<Book, String>() {
+
+                            @Override
+                            protected void updateItem(
+                                    String status,
+                                    boolean empty
+                            ) {
+
+                                super.updateItem(
+                                        status,
+                                        empty
+                                );
+
+                                if (empty || status == null) {
+
+                                    setText(null);
+                                    setStyle("");
+
+                                } else {
+
+                                    setText(status);
+
+                                    if (status.equals("Available")) {
+
+                                        setStyle(
+                                                "-fx-text-fill: green;" +
+                                                "-fx-font-weight: bold;"
+                                        );
+
+                                    } else {
+
+                                        setStyle(
+                                                "-fx-text-fill: red;" +
+                                                "-fx-font-weight: bold;"
+                                        );
+                                    }
+                                }
+                            }
+                        }
+        );
+
+        bookList =
+                FXCollections.observableArrayList(
+                        library.getBooks()
+                );
+
+        table.setItems(bookList);
+
+        // =========================
+        // TABLE SELECTION
+        // =========================
 
         table.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(
-                        (obs,
-                         oldBook,
-                         selectedBook) -> {
+                        (observable, oldBook, selectedBook) -> {
 
                             if (selectedBook != null) {
 
@@ -498,28 +487,24 @@ public class Main extends Application {
                         }
                 );
 
-        // =====================================================
-        // ISSUE / RETURN BUTTONS
-        // =====================================================
+        // =========================
+        // BUTTON ACTIONS
+        // =========================
 
-        Button issueButton =
-                new Button(
-                        "📤 Issue Book"
-                );
-
-        Button returnButton =
-                new Button(
-                        "📥 Return Book"
-                );
-
-        styleButton(
-                issueButton,
-                "#ea580c"
+        addButton.setOnAction(
+                e -> addBook()
         );
 
-        styleButton(
-                returnButton,
-                "#16a34a"
+        updateButton.setOnAction(
+                e -> updateBook()
+        );
+
+        deleteButton.setOnAction(
+                e -> deleteBook()
+        );
+
+        clearButton.setOnAction(
+                e -> clearForm()
         );
 
         issueButton.setOnAction(
@@ -530,110 +515,76 @@ public class Main extends Application {
                 e -> returnBook()
         );
 
-        HBox issueReturnBox =
-                new HBox(
-                        10,
-                        issueButton,
-                        returnButton
-                );
-
-        issueReturnBox.setAlignment(
-                Pos.CENTER
+        searchButton.setOnAction(
+                e -> searchBooks()
         );
 
-        // =====================================================
-        // TABLE TITLE
-        // =====================================================
+        // =========================
+        // SHOW ALL
+        // =========================
 
-        Label tableTitle =
-                new Label(
-                        "📋  Library Books"
-                );
+        showAllButton.setOnAction(
+                e -> {
 
-        tableTitle.setStyle(
-                "-fx-font-size: 19px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #0369a1;"
+                    searchField.clear();
+
+                    refreshTable();
+                }
         );
 
-        // =====================================================
-        // TABLE SECTION
-        // =====================================================
+        // =========================
+        // RESET SEARCH
+        // =========================
 
-        VBox tableSection =
+        resetSearchButton.setOnAction(
+                e -> {
+
+                    searchField.clear();
+
+                    refreshTable();
+                }
+        );
+
+        // Press Enter to search
+
+        searchField.setOnAction(
+                e -> searchBooks()
+        );
+
+        // =========================
+        // CENTER CONTENT
+        // =========================
+
+        VBox centerContent =
                 new VBox(
-                        12,
-                        tableTitle,
-                        searchBox,
-                        table,
-                        issueReturnBox
-                );
-
-        tableSection.setPadding(
-                new Insets(20)
-        );
-
-        tableSection.setStyle(
-                "-fx-background-color: #eff6ff;" +
-                "-fx-background-radius: 15;" +
-                "-fx-border-color: #93c5fd;" +
-                "-fx-border-radius: 15;" +
-                "-fx-border-width: 2;"
-        );
-
-        // =====================================================
-        // MAIN CONTENT
-        // =====================================================
-
-        VBox mainContent =
-                new VBox(
-                        20,
-                        header,
+                        15,
                         statistics,
-                        formCard,
-                        tableSection
+                        form,
+                        buttonBox,
+                        searchBox,
+                        table
                 );
 
-        mainContent.setPadding(
-                new Insets(20)
+        centerContent.setPadding(
+                new Insets(20, 0, 0, 0)
         );
 
-        mainContent.setAlignment(
-                Pos.TOP_CENTER
+        VBox.setVgrow(
+                table,
+                Priority.ALWAYS
         );
 
-        // =====================================================
-        // SCROLL PANE
-        // =====================================================
+        root.setCenter(centerContent);
 
-        ScrollPane scrollPane =
-                new ScrollPane(
-                        mainContent
-                );
+        // =========================
+        // STATISTICS
+        // =========================
 
-        scrollPane.setFitToWidth(true);
+        updateStatistics();
 
-        scrollPane.setStyle(
-                "-fx-background-color: transparent;"
-        );
-
-        // =====================================================
-        // ROOT
-        // =====================================================
-
-        BorderPane root =
-                new BorderPane();
-
-        root.setCenter(scrollPane);
-
-        root.setStyle(
-                "-fx-background-color: #dbeafe;" +
-                "-fx-font-family: 'Segoe UI';"
-        );
-
-        // =====================================================
+        // =========================
         // SCENE
-        // =====================================================
+        // =========================
 
         Scene scene =
                 new Scene(
@@ -642,153 +593,60 @@ public class Main extends Application {
                         750
                 );
 
-        // =====================================================
-        // STAGE
-        // =====================================================
-
         stage.setTitle(
                 "📚 Library Book Record System"
         );
 
         stage.setScene(scene);
 
-        stage.setWidth(1100);
-        stage.setHeight(750);
-
-        stage.setResizable(false);
+        /*
+         * COMMIT 3 IMPROVEMENT:
+         * The application window can now
+         * be resized by the user.
+         */
+        stage.setResizable(true);
 
         stage.show();
-
-        refreshTable();
     }
 
-    // =========================================================
-    // STATISTICS CARD
-    // =========================================================
-
-    private VBox createStatCard(
-            String icon,
-            Label label,
-            String backgroundColor) {
-
-        Label iconLabel =
-                new Label(icon);
-
-        iconLabel.setStyle(
-                "-fx-font-size: 30px;"
-        );
-
-        VBox card =
-                new VBox(
-                        5,
-                        iconLabel,
-                        label
-                );
-
-        card.setAlignment(
-                Pos.CENTER
-        );
-
-        card.setPadding(
-                new Insets(
-                        15,
-                        35,
-                        15,
-                        35
-                )
-        );
-
-        card.setMinWidth(190);
-
-        card.setStyle(
-                "-fx-background-color: "
-                        + backgroundColor + ";" +
-                "-fx-background-radius: 15;" +
-                "-fx-border-color: white;" +
-                "-fx-border-radius: 15;" +
-                "-fx-border-width: 2;"
-        );
-
-        return card;
-    }
-
-    // =========================================================
-    // STATISTICS LABEL STYLE
-    // =========================================================
-
-    private void styleStatisticsLabel(
-            Label label) {
-
-        label.setStyle(
-                "-fx-font-size: 15px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #1e293b;"
-        );
-    }
-
-    // =========================================================
-    // FORM LABEL STYLE
-    // =========================================================
-
-    private void styleFormLabel(
-            Label label) {
-
-        label.setStyle(
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-text-fill: #4c1d95;"
-        );
-    }
-
-    // =========================================================
-    // BUTTON STYLE
-    // =========================================================
-
-    private void styleButton(
-            Button button,
-            String color) {
-
-        button.setStyle(
-                "-fx-background-color: "
-                        + color + ";" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 13px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 9 15 9 15;" +
-                "-fx-background-radius: 8;" +
-                "-fx-border-radius: 8;"
-        );
-
-        button.setCursor(
-                javafx.scene.Cursor.HAND
-        );
-    }
-
-    // =========================================================
+    // =====================================================
     // ADD BOOK
-    // =========================================================
+    // =====================================================
 
     private void addBook() {
 
-        if (idField.getText().trim().isEmpty()
-                || titleField.getText().trim().isEmpty()
-                || authorField.getText().trim().isEmpty()
-                || categoryField.getText().trim().isEmpty()) {
+        String id =
+                idField.getText().trim();
+
+        String title =
+                titleField.getText().trim();
+
+        String author =
+                authorField.getText().trim();
+
+        String category =
+                categoryField.getText().trim();
+
+        String status =
+                statusBox.getValue();
+
+        if (id.isEmpty()
+                || title.isEmpty()
+                || author.isEmpty()
+                || category.isEmpty()) {
 
             showAlert(
-                    "Error",
+                    Alert.AlertType.WARNING,
                     "Please fill all fields."
             );
 
             return;
         }
 
-        if (library.searchById(
-                idField.getText().trim()
-        ) != null) {
+        if (library.searchById(id) != null) {
 
             showAlert(
-                    "Error",
+                    Alert.AlertType.ERROR,
                     "Book ID already exists."
             );
 
@@ -797,105 +655,30 @@ public class Main extends Application {
 
         Book book =
                 new Book(
-                        idField.getText().trim(),
-                        titleField.getText().trim(),
-                        authorField.getText().trim(),
-                        categoryField.getText().trim(),
-                        statusBox.getValue()
+                        id,
+                        title,
+                        author,
+                        category,
+                        status
                 );
 
         library.addBook(book);
 
         refreshTable();
 
-        clearFields();
-
-        updateStatistics();
+        clearForm();
 
         showAlert(
-                "Success",
-                "Book added successfully! 📚"
+                Alert.AlertType.INFORMATION,
+                "Book added successfully!"
         );
     }
 
-    // =========================================================
+    // =====================================================
     // UPDATE BOOK
-    // =========================================================
+    // =====================================================
 
     private void updateBook() {
-
-        if (idField.getText().trim().isEmpty()) {
-
-            showAlert(
-                    "Error",
-                    "Please select a book first."
-            );
-
-            return;
-        }
-
-        Book book =
-                library.searchById(
-                        idField.getText().trim()
-                );
-
-        if (book == null) {
-
-            showAlert(
-                    "Error",
-                    "Book not found."
-            );
-
-            return;
-        }
-
-        if (titleField.getText().trim().isEmpty()
-                || authorField.getText().trim().isEmpty()
-                || categoryField.getText().trim().isEmpty()) {
-
-            showAlert(
-                    "Error",
-                    "Please fill all fields."
-            );
-
-            return;
-        }
-
-        book.setTitle(
-                titleField.getText().trim()
-        );
-
-        book.setAuthor(
-                authorField.getText().trim()
-        );
-
-        book.setCategory(
-                categoryField.getText().trim()
-        );
-
-        book.setStatus(
-                statusBox.getValue()
-        );
-
-        library.saveChanges();
-
-        refreshTable();
-
-        clearFields();
-
-        updateStatistics();
-
-        showAlert(
-                "Success",
-                "Book updated successfully! ✏"
-        );
-    }
-
-    // =========================================================
-    // DELETE BOOK
-    // =========================================================
-
-    private void deleteBook() {
 
         String id =
                 idField.getText().trim();
@@ -903,8 +686,8 @@ public class Main extends Application {
         if (id.isEmpty()) {
 
             showAlert(
-                    "Error",
-                    "Please select a book first."
+                    Alert.AlertType.WARNING,
+                    "Please enter Book ID."
             );
 
             return;
@@ -916,7 +699,78 @@ public class Main extends Application {
         if (book == null) {
 
             showAlert(
-                    "Error",
+                    Alert.AlertType.ERROR,
+                    "Book not found."
+            );
+
+            return;
+        }
+
+        String title =
+                titleField.getText().trim();
+
+        String author =
+                authorField.getText().trim();
+
+        String category =
+                categoryField.getText().trim();
+
+        String status =
+                statusBox.getValue();
+
+        if (title.isEmpty()
+                || author.isEmpty()
+                || category.isEmpty()) {
+
+            showAlert(
+                    Alert.AlertType.WARNING,
+                    "Please fill all fields."
+            );
+
+            return;
+        }
+
+        book.setTitle(title);
+        book.setAuthor(author);
+        book.setCategory(category);
+        book.setStatus(status);
+
+        library.saveChanges();
+
+        refreshTable();
+
+        showAlert(
+                Alert.AlertType.INFORMATION,
+                "Book updated successfully!"
+        );
+    }
+
+    // =====================================================
+    // DELETE BOOK
+    // =====================================================
+
+    private void deleteBook() {
+
+        String id =
+                idField.getText().trim();
+
+        if (id.isEmpty()) {
+
+            showAlert(
+                    Alert.AlertType.WARNING,
+                    "Please enter or select a Book ID."
+            );
+
+            return;
+        }
+
+        Book book =
+                library.searchById(id);
+
+        if (book == null) {
+
+            showAlert(
+                    Alert.AlertType.ERROR,
                     "Book not found."
             );
 
@@ -933,150 +787,124 @@ public class Main extends Application {
         );
 
         confirmation.setHeaderText(
-                "🗑 Delete Book Confirmation"
+                "Delete this book?"
         );
 
         confirmation.setContentText(
-                "Are you sure you want to delete \""
-                        + book.getTitle()
-                        + "\"?"
+                "Book: " + book.getTitle()
         );
 
-        ButtonType yesButton =
-                new ButtonType(
-                        "Yes",
-                        ButtonBar.ButtonData.YES
-                );
+        Optional<ButtonType> result =
+                confirmation.showAndWait();
 
-        ButtonType noButton =
-                new ButtonType(
-                        "No",
-                        ButtonBar.ButtonData.NO
-                );
+        if (result.isPresent()
+                && result.get() == ButtonType.OK) {
 
-        confirmation.getButtonTypes()
-                .setAll(
-                        yesButton,
-                        noButton
-                );
+            library.deleteBook(id);
 
-        confirmation.showAndWait()
-                .ifPresent(response -> {
+            refreshTable();
 
-                    if (response == yesButton) {
+            clearForm();
 
-                        library.deleteBook(id);
-
-                        refreshTable();
-
-                        clearFields();
-
-                        updateStatistics();
-
-                        showAlert(
-                                "Success",
-                                "Book deleted successfully! 🗑"
-                        );
-                    }
-                });
+            showAlert(
+                    Alert.AlertType.INFORMATION,
+                    "Book deleted successfully!"
+            );
+        }
     }
 
-    // =========================================================
+    // =====================================================
     // ISSUE BOOK
-    // =========================================================
+    // =====================================================
 
     private void issueBook() {
 
-        Book selectedBook =
-                table.getSelectionModel()
-                        .getSelectedItem();
+        String id =
+                idField.getText().trim();
 
-        if (selectedBook == null) {
+        if (id.isEmpty()) {
 
             showAlert(
-                    "Error",
-                    "Please select a book from the table."
+                    Alert.AlertType.WARNING,
+                    "Please enter or select a Book ID."
             );
 
             return;
         }
 
-        if (library.issueBook(
-                selectedBook.getId()
-        )) {
+        if (library.issueBook(id)) {
 
             refreshTable();
 
-            updateStatistics();
+            clearForm();
 
             showAlert(
-                    "Success",
-                    "Book issued successfully! 📤"
+                    Alert.AlertType.INFORMATION,
+                    "Book issued successfully!"
             );
 
         } else {
 
             showAlert(
-                    "Error",
-                    "This book is already issued."
+                    Alert.AlertType.ERROR,
+                    "Book cannot be issued.\n"
+                    + "It may not exist or is already issued."
             );
         }
     }
 
-    // =========================================================
+    // =====================================================
     // RETURN BOOK
-    // =========================================================
+    // =====================================================
 
     private void returnBook() {
 
-        Book selectedBook =
-                table.getSelectionModel()
-                        .getSelectedItem();
+        String id =
+                idField.getText().trim();
 
-        if (selectedBook == null) {
+        if (id.isEmpty()) {
 
             showAlert(
-                    "Error",
-                    "Please select a book from the table."
+                    Alert.AlertType.WARNING,
+                    "Please enter or select a Book ID."
             );
 
             return;
         }
 
-        if (library.returnBook(
-                selectedBook.getId()
-        )) {
+        if (library.returnBook(id)) {
 
             refreshTable();
 
-            updateStatistics();
+            clearForm();
 
             showAlert(
-                    "Success",
-                    "Book returned successfully! 📥"
+                    Alert.AlertType.INFORMATION,
+                    "Book returned successfully!"
             );
 
         } else {
 
             showAlert(
-                    "Error",
-                    "This book is already available."
+                    Alert.AlertType.ERROR,
+                    "Book cannot be returned.\n"
+                    + "It may not exist or is already available."
             );
         }
     }
 
-    // =========================================================
-    // SEARCH BOOK
-    // =========================================================
+    // =====================================================
+    // SEARCH BOOKS
+    // =====================================================
 
-    private void searchBook() {
+    private void searchBooks() {
 
-        String search =
+        String searchText =
                 searchField.getText()
                         .trim()
                         .toLowerCase();
 
-        if (search.isEmpty()) {
+        if (searchText.isEmpty()) {
 
             refreshTable();
 
@@ -1086,16 +914,15 @@ public class Main extends Application {
         ObservableList<Book> results =
                 FXCollections.observableArrayList();
 
-        for (Book book :
-                library.getBooks()) {
+        for (Book book : library.getBooks()) {
 
             if (book.getId()
                     .toLowerCase()
-                    .contains(search)
+                    .contains(searchText)
                     ||
                 book.getTitle()
                     .toLowerCase()
-                    .contains(search)) {
+                    .contains(searchText)) {
 
                 results.add(book);
             }
@@ -1106,100 +933,33 @@ public class Main extends Application {
         if (results.isEmpty()) {
 
             showAlert(
-                    "Search Result",
-                    "No book found. 🔍"
+                    Alert.AlertType.INFORMATION,
+                    "No book found."
             );
         }
     }
 
-    // =========================================================
+    // =====================================================
     // REFRESH TABLE
-    // =========================================================
+    // =====================================================
 
     private void refreshTable() {
 
-        ObservableList<Book> list =
+        bookList =
                 FXCollections.observableArrayList(
                         library.getBooks()
                 );
 
-        table.setItems(list);
+        table.setItems(bookList);
 
         updateStatistics();
     }
 
-    // =========================================================
-    // COUNT AVAILABLE
-    // =========================================================
+    // =====================================================
+    // CLEAR FORM
+    // =====================================================
 
-    private int countAvailable() {
-
-        int count = 0;
-
-        for (Book book :
-                library.getBooks()) {
-
-            if (book.getStatus()
-                    .equals("Available")) {
-
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    // =========================================================
-    // COUNT ISSUED
-    // =========================================================
-
-    private int countIssued() {
-
-        int count = 0;
-
-        for (Book book :
-                library.getBooks()) {
-
-            if (book.getStatus()
-                    .equals("Issued")) {
-
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    // =========================================================
-    // UPDATE STATISTICS
-    // =========================================================
-
-    private void updateStatistics() {
-
-        if (totalBooksLabel != null) {
-
-            totalBooksLabel.setText(
-                    "Total Books: "
-                            + library.getBooks().size()
-            );
-
-            availableBooksLabel.setText(
-                    "Available: "
-                            + countAvailable()
-            );
-
-            issuedBooksLabel.setText(
-                    "Issued: "
-                            + countIssued()
-            );
-        }
-    }
-
-    // =========================================================
-    // CLEAR FIELDS
-    // =========================================================
-
-    private void clearFields() {
+    private void clearForm() {
 
         idField.clear();
 
@@ -1209,28 +969,114 @@ public class Main extends Application {
 
         categoryField.clear();
 
-        statusBox.setValue(
-                "Available"
-        );
+        statusBox.setValue("Available");
 
         table.getSelectionModel()
                 .clearSelection();
     }
 
-    // =========================================================
-    // ALERT
-    // =========================================================
+    // =====================================================
+    // UPDATE STATISTICS
+    // =====================================================
 
-    private void showAlert(
+    private void updateStatistics() {
+
+        int total =
+                library.getBooks().size();
+
+        int available = 0;
+
+        int issued = 0;
+
+        for (Book book : library.getBooks()) {
+
+            if (book.getStatus()
+                    .equals("Available")) {
+
+                available++;
+
+            } else if (book.getStatus()
+                    .equals("Issued")) {
+
+                issued++;
+            }
+        }
+
+        totalLabel.setText(
+                String.valueOf(total)
+        );
+
+        availableLabel.setText(
+                String.valueOf(available)
+        );
+
+        issuedLabel.setText(
+                String.valueOf(issued)
+        );
+    }
+
+    // =====================================================
+    // CREATE STATISTICS CARD
+    // =====================================================
+
+    private VBox createCard(
             String title,
-            String message) {
+            Label value
+    ) {
 
-        Alert alert =
-                new Alert(
-                        Alert.AlertType.INFORMATION
+        Label titleLabel =
+                new Label(title);
+
+        titleLabel.setStyle(
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;"
+        );
+
+        value.setStyle(
+                "-fx-font-size: 25px;" +
+                "-fx-font-weight: bold;"
+        );
+
+        VBox card =
+                new VBox(
+                        5,
+                        titleLabel,
+                        value
                 );
 
-        alert.setTitle(title);
+        card.setAlignment(
+                Pos.CENTER
+        );
+
+        card.setPrefWidth(200);
+
+        card.setPadding(
+                new Insets(15)
+        );
+
+        card.setStyle(
+                "-fx-background-color: #f1f5f9;" +
+                "-fx-background-radius: 10;"
+        );
+
+        return card;
+    }
+
+    // =====================================================
+    // ALERT
+    // =====================================================
+
+    private void showAlert(
+            Alert.AlertType type,
+            String message
+    ) {
+
+        Alert alert =
+                new Alert(type);
+
+        alert.setTitle(
+                "Library Book Record System"
+        );
 
         alert.setHeaderText(null);
 
@@ -1239,12 +1085,12 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
-    // =========================================================
+    // =====================================================
     // MAIN
-    // =========================================================
+    // =====================================================
 
-    public static void main(
-            String[] args) {
+    public static void main(String[] args) {
 
         launch(args);
-    }}
+    }
+}
