@@ -1,3 +1,4 @@
+
 package library;
 
 import javafx.application.Application;
@@ -43,7 +44,6 @@ public class Main extends Application {
     private Label availableBooksLabel;
     private Label issuedBooksLabel;
 
-
     @Override
     public void start(Stage stage) {
 
@@ -88,7 +88,6 @@ public class Main extends Application {
                 "-fx-background-radius: 15;"
         );
 
-
         // =====================================================
         // STATISTICS
         // =====================================================
@@ -112,15 +111,8 @@ public class Main extends Application {
                 );
 
         styleStatisticsLabel(totalBooksLabel);
-
-        styleStatisticsLabel(
-                availableBooksLabel
-        );
-
-        styleStatisticsLabel(
-                issuedBooksLabel
-        );
-
+        styleStatisticsLabel(availableBooksLabel);
+        styleStatisticsLabel(issuedBooksLabel);
 
         HBox statistics =
                 new HBox(
@@ -142,173 +134,75 @@ public class Main extends Application {
                         )
                 );
 
-        statistics.setAlignment(
-                Pos.CENTER
-        );
+        statistics.setAlignment(Pos.CENTER);
 
         statistics.setPadding(
                 new Insets(5, 0, 5, 0)
         );
 
-
         // =====================================================
         // INPUT FIELDS
         // =====================================================
 
-        idField =
-                new TextField();
+        idField = new TextField();
+        idField.setPromptText("Enter Book ID");
 
-        idField.setPromptText(
-                "Enter Book ID"
-        );
+        titleField = new TextField();
+        titleField.setPromptText("Enter Book Title");
 
+        authorField = new TextField();
+        authorField.setPromptText("Enter Author");
 
-        titleField =
-                new TextField();
+        categoryField = new TextField();
+        categoryField.setPromptText("Enter Category");
 
-        titleField.setPromptText(
-                "Enter Book Title"
-        );
-
-
-        authorField =
-                new TextField();
-
-        authorField.setPromptText(
-                "Enter Author"
-        );
-
-
-        categoryField =
-                new TextField();
-
-        categoryField.setPromptText(
-                "Enter Category"
-        );
-
-
-        statusBox =
-                new ComboBox<>();
+        statusBox = new ComboBox<>();
 
         statusBox.getItems().addAll(
                 "Available",
                 "Issued"
         );
 
-        statusBox.setValue(
-                "Available"
-        );
+        statusBox.setValue("Available");
 
-        statusBox.setPrefWidth(
-                200
-        );
-
+        statusBox.setPrefWidth(200);
 
         // =====================================================
         // INPUT GRID
         // =====================================================
 
-        GridPane inputGrid =
-                new GridPane();
+        GridPane inputGrid = new GridPane();
 
         inputGrid.setHgap(15);
-
         inputGrid.setVgap(12);
+        inputGrid.setPadding(new Insets(10));
 
-        inputGrid.setPadding(
-                new Insets(10)
-        );
-
-
-        Label idLabel =
-                new Label("Book ID");
-
-        Label titleLabel =
-                new Label("Book Title");
-
-        Label authorLabel =
-                new Label("Author");
-
-        Label categoryLabel =
-                new Label("Category");
-
-        Label statusLabel =
-                new Label("Status");
-
+        Label idLabel = new Label("Book ID");
+        Label titleLabel = new Label("Book Title");
+        Label authorLabel = new Label("Author");
+        Label categoryLabel = new Label("Category");
+        Label statusLabel = new Label("Status");
 
         styleFormLabel(idLabel);
-
         styleFormLabel(titleLabel);
-
         styleFormLabel(authorLabel);
-
         styleFormLabel(categoryLabel);
-
         styleFormLabel(statusLabel);
 
+        inputGrid.add(idLabel, 0, 0);
+        inputGrid.add(idField, 1, 0);
 
-        inputGrid.add(
-                idLabel,
-                0,
-                0
-        );
+        inputGrid.add(titleLabel, 2, 0);
+        inputGrid.add(titleField, 3, 0);
 
-        inputGrid.add(
-                idField,
-                1,
-                0
-        );
+        inputGrid.add(authorLabel, 0, 1);
+        inputGrid.add(authorField, 1, 1);
 
-        inputGrid.add(
-                titleLabel,
-                2,
-                0
-        );
+        inputGrid.add(categoryLabel, 2, 1);
+        inputGrid.add(categoryField, 3, 1);
 
-        inputGrid.add(
-                titleField,
-                3,
-                0
-        );
-
-
-        inputGrid.add(
-                authorLabel,
-                0,
-                1
-        );
-
-        inputGrid.add(
-                authorField,
-                1,
-                1
-        );
-
-        inputGrid.add(
-                categoryLabel,
-                2,
-                1
-        );
-
-        inputGrid.add(
-                categoryField,
-                3,
-                1
-        );
-
-
-        inputGrid.add(
-                statusLabel,
-                0,
-                2
-        );
-
-        inputGrid.add(
-                statusBox,
-                1,
-                2
-        );
-
+        inputGrid.add(statusLabel, 0, 2);
+        inputGrid.add(statusBox, 1, 2);
 
         // =====================================================
         // FORM BUTTONS
@@ -326,27 +220,10 @@ public class Main extends Application {
         Button clearButton =
                 new Button("Clear");
 
-
-        styleButton(
-                addButton,
-                "#2563eb"
-        );
-
-        styleButton(
-                updateButton,
-                "#7c3aed"
-        );
-
-        styleButton(
-                deleteButton,
-                "#dc2626"
-        );
-
-        styleButton(
-                clearButton,
-                "#64748b"
-        );
-
+        styleButton(addButton, "#2563eb");
+        styleButton(updateButton, "#7c3aed");
+        styleButton(deleteButton, "#dc2626");
+        styleButton(clearButton, "#64748b");
 
         addButton.setOnAction(
                 e -> addBook()
@@ -364,7 +241,6 @@ public class Main extends Application {
                 e -> clearFields()
         );
 
-
         HBox buttons =
                 new HBox(
                         10,
@@ -374,10 +250,7 @@ public class Main extends Application {
                         clearButton
                 );
 
-        buttons.setAlignment(
-                Pos.CENTER
-        );
-
+        buttons.setAlignment(Pos.CENTER);
 
         // =====================================================
         // FORM TITLE
@@ -393,7 +266,6 @@ public class Main extends Application {
                 "-fx-font-weight: bold;" +
                 "-fx-text-fill: #6d28d9;"
         );
-
 
         // =====================================================
         // FORM CARD
@@ -419,22 +291,17 @@ public class Main extends Application {
                 "-fx-border-width: 2;"
         );
 
-
         // =====================================================
         // SEARCH
         // =====================================================
 
-        searchField =
-                new TextField();
+        searchField = new TextField();
 
         searchField.setPromptText(
                 "🔍 Search by Book ID or Title"
         );
 
-        searchField.setPrefWidth(
-                350
-        );
-
+        searchField.setPrefWidth(300);
 
         Button searchButton =
                 new Button("🔍 Search");
@@ -442,6 +309,9 @@ public class Main extends Application {
         Button showAllButton =
                 new Button("📋 Show All");
 
+        // NEW BUTTON FOR COMMIT 2
+        Button resetSearchButton =
+                new Button("🔄 Reset Search");
 
         styleButton(
                 searchButton,
@@ -453,6 +323,10 @@ public class Main extends Application {
                 "#0f766e"
         );
 
+        styleButton(
+                resetSearchButton,
+                "#9333ea"
+        );
 
         searchButton.setOnAction(
                 e -> searchBook()
@@ -462,86 +336,69 @@ public class Main extends Application {
                 e -> refreshTable()
         );
 
+        // NEW RESET SEARCH FUNCTION
+        resetSearchButton.setOnAction(
+                e -> {
+                    searchField.clear();
+                    refreshTable();
+                }
+        );
 
         HBox searchBox =
                 new HBox(
                         10,
                         searchField,
                         searchButton,
-                        showAllButton
+                        showAllButton,
+                        resetSearchButton
                 );
 
         searchBox.setAlignment(
                 Pos.CENTER
         );
 
-
         // =====================================================
         // TABLE
         // =====================================================
 
-        table =
-                new TableView<>();
+        table = new TableView<>();
 
-        table.setPrefHeight(
-                300
-        );
+        table.setPrefHeight(300);
 
-
-        // Book ID
         TableColumn<Book, String> idColumn =
-                new TableColumn<>(
-                        "Book ID"
-                );
+                new TableColumn<>("Book ID");
 
         idColumn.setCellValueFactory(
                 new PropertyValueFactory<>("id")
         );
 
-
-        // Book Title
         TableColumn<Book, String> titleColumn =
-                new TableColumn<>(
-                        "Book Title"
-                );
+                new TableColumn<>("Book Title");
 
         titleColumn.setCellValueFactory(
                 new PropertyValueFactory<>("title")
         );
 
-
-        // Author
         TableColumn<Book, String> authorColumn =
-                new TableColumn<>(
-                        "Author"
-                );
+                new TableColumn<>("Author");
 
         authorColumn.setCellValueFactory(
                 new PropertyValueFactory<>("author")
         );
 
-
-        // Category
         TableColumn<Book, String> categoryColumn =
-                new TableColumn<>(
-                        "Category"
-                );
+                new TableColumn<>("Category");
 
         categoryColumn.setCellValueFactory(
                 new PropertyValueFactory<>("category")
         );
 
-
-        // Status
         TableColumn<Book, String> statusColumn =
-                new TableColumn<>(
-                        "Status"
-                );
+                new TableColumn<>("Status");
 
         statusColumn.setCellValueFactory(
                 new PropertyValueFactory<>("status")
         );
-
 
         // =====================================================
         // COLORFUL STATUS CELLS
@@ -561,12 +418,10 @@ public class Main extends Application {
                                         empty
                                 );
 
-
                                 if (empty ||
                                         status == null) {
 
                                     setText(null);
-
                                     setStyle("");
 
                                 } else {
@@ -595,7 +450,6 @@ public class Main extends Application {
                         }
         );
 
-
         table.getColumns().addAll(
                 idColumn,
                 titleColumn,
@@ -604,11 +458,9 @@ public class Main extends Application {
                 statusColumn
         );
 
-
         table.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY
         );
-
 
         // =====================================================
         // TABLE ROW SELECTION
@@ -646,7 +498,6 @@ public class Main extends Application {
                         }
                 );
 
-
         // =====================================================
         // ISSUE / RETURN BUTTONS
         // =====================================================
@@ -661,7 +512,6 @@ public class Main extends Application {
                         "📥 Return Book"
                 );
 
-
         styleButton(
                 issueButton,
                 "#ea580c"
@@ -672,7 +522,6 @@ public class Main extends Application {
                 "#16a34a"
         );
 
-
         issueButton.setOnAction(
                 e -> issueBook()
         );
@@ -680,7 +529,6 @@ public class Main extends Application {
         returnButton.setOnAction(
                 e -> returnBook()
         );
-
 
         HBox issueReturnBox =
                 new HBox(
@@ -692,7 +540,6 @@ public class Main extends Application {
         issueReturnBox.setAlignment(
                 Pos.CENTER
         );
-
 
         // =====================================================
         // TABLE TITLE
@@ -708,7 +555,6 @@ public class Main extends Application {
                 "-fx-font-weight: bold;" +
                 "-fx-text-fill: #0369a1;"
         );
-
 
         // =====================================================
         // TABLE SECTION
@@ -735,7 +581,6 @@ public class Main extends Application {
                 "-fx-border-width: 2;"
         );
 
-
         // =====================================================
         // MAIN CONTENT
         // =====================================================
@@ -757,7 +602,6 @@ public class Main extends Application {
                 Pos.TOP_CENTER
         );
 
-
         // =====================================================
         // SCROLL PANE
         // =====================================================
@@ -767,14 +611,11 @@ public class Main extends Application {
                         mainContent
                 );
 
-        scrollPane.setFitToWidth(
-                true
-        );
+        scrollPane.setFitToWidth(true);
 
         scrollPane.setStyle(
                 "-fx-background-color: transparent;"
         );
-
 
         // =====================================================
         // ROOT
@@ -783,15 +624,12 @@ public class Main extends Application {
         BorderPane root =
                 new BorderPane();
 
-        root.setCenter(
-                scrollPane
-        );
+        root.setCenter(scrollPane);
 
         root.setStyle(
                 "-fx-background-color: #dbeafe;" +
                 "-fx-font-family: 'Segoe UI';"
         );
-
 
         // =====================================================
         // SCENE
@@ -800,10 +638,9 @@ public class Main extends Application {
         Scene scene =
                 new Scene(
                         root,
-                        1000,
-                        620
+                        1100,
+                        750
                 );
-
 
         // =====================================================
         // STAGE
@@ -813,24 +650,17 @@ public class Main extends Application {
                 "📚 Library Book Record System"
         );
 
-        stage.setScene(
-                scene
-        );
+        stage.setScene(scene);
 
-        stage.setMinWidth(
-                900
-        );
+        stage.setWidth(1100);
+        stage.setHeight(750);
 
-        stage.setMinHeight(
-                650
-        );
+        stage.setResizable(false);
 
         stage.show();
 
-
         refreshTable();
     }
-
 
     // =========================================================
     // STATISTICS CARD
@@ -847,7 +677,6 @@ public class Main extends Application {
         iconLabel.setStyle(
                 "-fx-font-size: 30px;"
         );
-
 
         VBox card =
                 new VBox(
@@ -869,9 +698,7 @@ public class Main extends Application {
                 )
         );
 
-        card.setMinWidth(
-                190
-        );
+        card.setMinWidth(190);
 
         card.setStyle(
                 "-fx-background-color: "
@@ -884,7 +711,6 @@ public class Main extends Application {
 
         return card;
     }
-
 
     // =========================================================
     // STATISTICS LABEL STYLE
@@ -900,7 +726,6 @@ public class Main extends Application {
         );
     }
 
-
     // =========================================================
     // FORM LABEL STYLE
     // =========================================================
@@ -914,7 +739,6 @@ public class Main extends Application {
                 "-fx-text-fill: #4c1d95;"
         );
     }
-
 
     // =========================================================
     // BUTTON STYLE
@@ -940,7 +764,6 @@ public class Main extends Application {
         );
     }
 
-
     // =========================================================
     // ADD BOOK
     // =========================================================
@@ -960,7 +783,6 @@ public class Main extends Application {
             return;
         }
 
-
         if (library.searchById(
                 idField.getText().trim()
         ) != null) {
@@ -973,7 +795,6 @@ public class Main extends Application {
             return;
         }
 
-
         Book book =
                 new Book(
                         idField.getText().trim(),
@@ -983,7 +804,6 @@ public class Main extends Application {
                         statusBox.getValue()
                 );
 
-
         library.addBook(book);
 
         refreshTable();
@@ -992,13 +812,11 @@ public class Main extends Application {
 
         updateStatistics();
 
-
         showAlert(
                 "Success",
                 "Book added successfully! 📚"
         );
     }
-
 
     // =========================================================
     // UPDATE BOOK
@@ -1016,12 +834,10 @@ public class Main extends Application {
             return;
         }
 
-
         Book book =
                 library.searchById(
                         idField.getText().trim()
                 );
-
 
         if (book == null) {
 
@@ -1032,7 +848,6 @@ public class Main extends Application {
 
             return;
         }
-
 
         if (titleField.getText().trim().isEmpty()
                 || authorField.getText().trim().isEmpty()
@@ -1045,7 +860,6 @@ public class Main extends Application {
 
             return;
         }
-
 
         book.setTitle(
                 titleField.getText().trim()
@@ -1063,9 +877,7 @@ public class Main extends Application {
                 statusBox.getValue()
         );
 
-
         library.saveChanges();
-
 
         refreshTable();
 
@@ -1073,13 +885,11 @@ public class Main extends Application {
 
         updateStatistics();
 
-
         showAlert(
                 "Success",
                 "Book updated successfully! ✏"
         );
     }
-
 
     // =========================================================
     // DELETE BOOK
@@ -1089,7 +899,6 @@ public class Main extends Application {
 
         String id =
                 idField.getText().trim();
-
 
         if (id.isEmpty()) {
 
@@ -1101,10 +910,8 @@ public class Main extends Application {
             return;
         }
 
-
         Book book =
                 library.searchById(id);
-
 
         if (book == null) {
 
@@ -1115,7 +922,6 @@ public class Main extends Application {
 
             return;
         }
-
 
         Alert confirmation =
                 new Alert(
@@ -1136,7 +942,6 @@ public class Main extends Application {
                         + "\"?"
         );
 
-
         ButtonType yesButton =
                 new ButtonType(
                         "Yes",
@@ -1149,13 +954,11 @@ public class Main extends Application {
                         ButtonBar.ButtonData.NO
                 );
 
-
         confirmation.getButtonTypes()
                 .setAll(
                         yesButton,
                         noButton
                 );
-
 
         confirmation.showAndWait()
                 .ifPresent(response -> {
@@ -1170,7 +973,6 @@ public class Main extends Application {
 
                         updateStatistics();
 
-
                         showAlert(
                                 "Success",
                                 "Book deleted successfully! 🗑"
@@ -1178,7 +980,6 @@ public class Main extends Application {
                     }
                 });
     }
-
 
     // =========================================================
     // ISSUE BOOK
@@ -1190,7 +991,6 @@ public class Main extends Application {
                 table.getSelectionModel()
                         .getSelectedItem();
 
-
         if (selectedBook == null) {
 
             showAlert(
@@ -1201,7 +1001,6 @@ public class Main extends Application {
             return;
         }
 
-
         if (library.issueBook(
                 selectedBook.getId()
         )) {
@@ -1209,7 +1008,6 @@ public class Main extends Application {
             refreshTable();
 
             updateStatistics();
-
 
             showAlert(
                     "Success",
@@ -1225,7 +1023,6 @@ public class Main extends Application {
         }
     }
 
-
     // =========================================================
     // RETURN BOOK
     // =========================================================
@@ -1235,7 +1032,6 @@ public class Main extends Application {
         Book selectedBook =
                 table.getSelectionModel()
                         .getSelectedItem();
-
 
         if (selectedBook == null) {
 
@@ -1247,7 +1043,6 @@ public class Main extends Application {
             return;
         }
 
-
         if (library.returnBook(
                 selectedBook.getId()
         )) {
@@ -1255,7 +1050,6 @@ public class Main extends Application {
             refreshTable();
 
             updateStatistics();
-
 
             showAlert(
                     "Success",
@@ -1271,7 +1065,6 @@ public class Main extends Application {
         }
     }
 
-
     // =========================================================
     // SEARCH BOOK
     // =========================================================
@@ -1283,7 +1076,6 @@ public class Main extends Application {
                         .trim()
                         .toLowerCase();
 
-
         if (search.isEmpty()) {
 
             refreshTable();
@@ -1291,10 +1083,8 @@ public class Main extends Application {
             return;
         }
 
-
         ObservableList<Book> results =
                 FXCollections.observableArrayList();
-
 
         for (Book book :
                 library.getBooks()) {
@@ -1311,11 +1101,7 @@ public class Main extends Application {
             }
         }
 
-
-        table.setItems(
-                results
-        );
-
+        table.setItems(results);
 
         if (results.isEmpty()) {
 
@@ -1325,7 +1111,6 @@ public class Main extends Application {
             );
         }
     }
-
 
     // =========================================================
     // REFRESH TABLE
@@ -1338,13 +1123,10 @@ public class Main extends Application {
                         library.getBooks()
                 );
 
-        table.setItems(
-                list
-        );
+        table.setItems(list);
 
         updateStatistics();
     }
-
 
     // =========================================================
     // COUNT AVAILABLE
@@ -1353,7 +1135,6 @@ public class Main extends Application {
     private int countAvailable() {
 
         int count = 0;
-
 
         for (Book book :
                 library.getBooks()) {
@@ -1365,10 +1146,8 @@ public class Main extends Application {
             }
         }
 
-
         return count;
     }
-
 
     // =========================================================
     // COUNT ISSUED
@@ -1377,7 +1156,6 @@ public class Main extends Application {
     private int countIssued() {
 
         int count = 0;
-
 
         for (Book book :
                 library.getBooks()) {
@@ -1389,10 +1167,8 @@ public class Main extends Application {
             }
         }
 
-
         return count;
     }
-
 
     // =========================================================
     // UPDATE STATISTICS
@@ -1419,7 +1195,6 @@ public class Main extends Application {
         }
     }
 
-
     // =========================================================
     // CLEAR FIELDS
     // =========================================================
@@ -1442,7 +1217,6 @@ public class Main extends Application {
                 .clearSelection();
     }
 
-
     // =========================================================
     // ALERT
     // =========================================================
@@ -1456,21 +1230,14 @@ public class Main extends Application {
                         Alert.AlertType.INFORMATION
                 );
 
-        alert.setTitle(
-                title
-        );
+        alert.setTitle(title);
 
-        alert.setHeaderText(
-                null
-        );
+        alert.setHeaderText(null);
 
-        alert.setContentText(
-                message
-        );
+        alert.setContentText(message);
 
         alert.showAndWait();
     }
-
 
     // =========================================================
     // MAIN
@@ -1480,5 +1247,4 @@ public class Main extends Application {
             String[] args) {
 
         launch(args);
-    }
-}
+    }}
